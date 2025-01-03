@@ -24,8 +24,8 @@ best_params = {}
 
 with mlflow.start_run():
     # Log parameters
-    n_estimators = random.randint(0,1000)
-    max_depth = random.randint(1,50)
+    n_estimators = 505
+    max_depth = 37
     mlflow.autolog()
     # Train model
     model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
@@ -39,7 +39,7 @@ with mlflow.start_run():
     accuracy = model.score(X_test, y_test)
     mlflow.log_metric("accuracy", accuracy)
 
-    
+
 # Mendifinisikan model menggunakan hyperparameter tuning.
 # # Define Elastic Search parameters
 # n_estimators_range = np.linspace(10, 1000, 5, dtype=int)  # 5 evenly spaced values
