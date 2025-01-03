@@ -38,6 +38,8 @@ with mlflow.start_run():
     # Log metrics
     accuracy = model.score(X_test, y_test)
     mlflow.log_metric("accuracy", accuracy)
+
+    
 # Mendifinisikan model menggunakan hyperparameter tuning.
 # # Define Elastic Search parameters
 # n_estimators_range = np.linspace(10, 1000, 5, dtype=int)  # 5 evenly spaced values

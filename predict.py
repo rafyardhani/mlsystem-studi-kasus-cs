@@ -1,9 +1,5 @@
-from mlflow.models import validate_serving_input
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
 import mlflow
 import pandas as pd
-from mlflow.models import convert_input_example_to_serving_input
 import joblib
 import numpy as np
 import pandas as pd
