@@ -20,7 +20,7 @@ if __name__ == "__main__":
     np.random.seed(40)
 
     # Read the wine-quality csv file (make sure you're running this from the root of MLflow!)
-    file_path = sys.argv[3] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "train_pca_testing.csv")
+    file_path = sys.argv[3] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "train_pca.csv")
     data = pd.read_csv(file_path)
 
     # The predicted column is "quality" which is a scalar from [3, 9]
