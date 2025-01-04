@@ -60,7 +60,7 @@ jobs:
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: |
           echo "Mulai upload folder mlruns ke Google Drive..."
-          python MLproject/upload_to_drive.py "./mlruns" "$GDRIVE_FOLDER_ID"
+          python MLproject/upload_to_gdrive.py "./mlruns" "$GDRIVE_FOLDER_ID"
             
       # - name: Set up Git LFS
       #   run: |
