@@ -42,5 +42,4 @@ if __name__ == "__main__":
         model.fit(X_train, y_train)
         # Log metrics
         accuracy = model.score(X_test, y_test)
-
-        mlflow.sklearn.log_model(model, "model")
+        mlflow.log_metric("accuracy", accuracy)
