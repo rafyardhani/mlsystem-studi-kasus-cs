@@ -23,9 +23,6 @@ if __name__ == "__main__":
     file_path = sys.argv[3] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "train_pca.csv")
     data = pd.read_csv(file_path)
 
-    # Split the data into training and test sets. (0.75, 0.25) split.
-    train, test = train_test_split(data)
-
     # The predicted column is "quality" which is a scalar from [3, 9]
     X_train, X_test, y_train, y_test = train_test_split(
     data.drop("Credit_Score", axis=1),
