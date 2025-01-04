@@ -4,25 +4,31 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+# --------------------------------------------------------------------
 # 1. Load credential service account
+# --------------------------------------------------------------------
 creds = json.loads(os.environ["GDRIVE_CREDENTIALS"])
 credentials = Credentials.from_service_account_info(
     creds,
     scopes=["https://www.googleapis.com/auth/drive"]
 )
 
-# 2. Build Drive API
+# Build Drive API
 service = build('drive', 'v3', credentials=credentials)
 
-# 3. ID Shared Drive (pastikan benar, dan SA punya akses Content Manager)
-SHARED_DRIVE_ID = "1f5ecMJvCs6jYT2kkeNn0zoZ9xyXAWFRC"  # Contoh, mungkin berbeda format
+# --------------------------------------------------------------------
+# 2. Buat folder "mlruns" di Shared Drive
+#    Pastikan SHARED_DRIVE_ID adalah ID root Shared Drive (atau folder 
+#    di Shared Drive) yang bisa diakses oleh service account Anda.
+# --------------------------------------------------------------------
+SHARED_DRIVE_ID = "1f5ecMJvCs6jYT2kkeNn0zoZ9xyXAWFRC"
 
-# 4. Buat folder "mlruns" di root Shared Drive
 folder_metadata = {
     'name': 'mlruns',
     'mimeType': 'application/vnd.google-apps.folder',
-    'parents': [SHARED_DRIVE_ID]
+    'parents': [SHARED_DRIVE_ID]  # Jika ini ID root Shared Drive -> folder "mlruns" muncul di root
 }
+
 mlruns_folder = service.files().create(
     body=folder_metadata,
     fields='id',
@@ -32,18 +38,22 @@ mlruns_folder_id = mlruns_folder.get('id')
 print(f"Folder 'mlruns' created in Shared Drive with ID: {mlruns_folder_id}")
 
 
+# --------------------------------------------------------------------
+# 3. Fungsi rekursif untuk membuat folder dan upload file
+#    Menjaga struktur subfolder sesuai di lokal
+# --------------------------------------------------------------------
 def upload_directory(local_dir_path, parent_drive_id):
     """
-    Fungsi rekursif untuk:
-    - Membuat subfolder di Drive jika ketemu subfolder di lokal,
-    - Mengunggah file ke folder Drive sesuai struktur lokal.
+    Melakukan:
+      - Cek item di local_dir_path,
+      - Jika folder -> buat folder di Drive (dengan parent_drive_id), 
+                      lalu rekursif ke dalamnya,
+      - Jika file   -> upload file ke Drive (parent_drive_id).
     """
-    # List isi folder lokal
     for item_name in os.listdir(local_dir_path):
-        item_full_path = os.path.join(local_dir_path, item_name)
-
-        if os.path.isdir(item_full_path):
-            # Buat folder dengan nama item_name di Drive
+        local_path = os.path.join(local_dir_path, item_name)
+        if os.path.isdir(local_path):
+            # Buat folder di Drive
             folder_meta = {
                 'name': item_name,
                 'mimeType': 'application/vnd.google-apps.folder',
@@ -56,20 +66,18 @@ def upload_directory(local_dir_path, parent_drive_id):
             ).execute()
 
             new_folder_id = created_folder.get('id')
-            print(f"Folder created: {item_name} (ID: {new_folder_id})")
+            print(f"Created folder: {item_name} (ID: {new_folder_id})")
 
             # Rekursif ke subfolder
-            upload_directory(item_full_path, new_folder_id)
-
+            upload_directory(local_path, new_folder_id)
         else:
-            # Jika item adalah file, upload ke parent_drive_id
+            # Upload file
             print(f"Uploading file: {item_name}")
             file_meta = {
                 'name': item_name,
                 'parents': [parent_drive_id]
             }
-            media = MediaFileUpload(item_full_path, resumable=True)
-
+            media = MediaFileUpload(local_path, resumable=True)
             service.files().create(
                 body=file_meta,
                 media_body=media,
@@ -78,9 +86,34 @@ def upload_directory(local_dir_path, parent_drive_id):
             ).execute()
 
 
-# 5. Jalankan upload directory rekursif mulai dari ./mlruns/0
-local_mlruns_0_path = './mlruns/0'
-upload_directory(local_mlruns_0_path, mlruns_folder_id)
+# --------------------------------------------------------------------
+# 4. Mulai upload dari 'run_id' yang ada di dalam "./mlruns/0"
+#    Sehingga folder '0' di lokal TIDAK terbawa ke Drive.
+# --------------------------------------------------------------------
+local_mlruns_0 = './mlruns/0'
 
-print("All files & subfolders uploaded successfully!")
-print("Drive link:", f"https://drive.google.com/drive/folders/{mlruns_folder_id}")
+# Di dalam './mlruns/0', biasanya ada subfolder = <run_id_1>, <run_id_2>, dsb.
+# Kita akan membuat subfolder <run_id_x> langsung di bawah folder "mlruns" di Drive.
+for run_id_name in os.listdir(local_mlruns_0):
+    run_id_local_path = os.path.join(local_mlruns_0, run_id_name)
+    
+    # Pastikan ini adalah folder, bukan file
+    if os.path.isdir(run_id_local_path):
+        # Buat folder <run_id_name> di dalam "mlruns"
+        run_id_folder_meta = {
+            'name': run_id_name,
+            'mimeType': 'application/vnd.google-apps.folder',
+            'parents': [mlruns_folder_id]
+        }
+        run_id_folder = service.files().create(
+            body=run_id_folder_meta,
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        run_id_folder_id = run_id_folder.get('id')
+        print(f"Created run_id folder: {run_id_name} (ID: {run_id_folder_id})")
+
+        # Upload isinya secara rekursif
+        upload_directory(run_id_local_path, run_id_folder_id)
+
+print(f"All run_id folders and files have been uploaded to Drive!")
