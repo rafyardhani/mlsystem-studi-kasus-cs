@@ -11,7 +11,7 @@ on:
       - main
 
 env:
-  CSV_URL: "MLproject/train_pca.csv"
+  CSV_URL: "MLproject/train_pca_testing.csv"
   TARGET_VAR: "Credit_Score"
   n_estimators: 505
   max_depth: 37
@@ -50,16 +50,17 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install mlflow PyDrive2
+          python -m pip install --upgrade pip
+          pip install mlflow PyDrive2 google-auth google-auth-oauthlib google-auth-httplib2
         
-      - name: Upload to Google Drive
-        run: |
-          # Misalkan folder GDrive ID disimpan sebagai secret `GDRIVE_FOLDER_ID`
-          echo "Mengunggah folder mlruns ke Google Drive..."
-          python MLproject/upload_to_gdrive.py "./mlruns" "${{ secrets.GDRIVE_FOLDER_ID }}"
+      - name: Upload artifacts to Google Drive
         env:
-          # Environment var berisi credentials JSON
-          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}    # JSON isi credential
+          # Opsional: folder ID bisa disimpan di secrets/variable
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: |
+          echo "Mulai upload folder mlruns ke Google Drive..."
+          python MLproject/upload_to_drive.py "./mlruns" "$GDRIVE_FOLDER_ID"
             
       # - name: Set up Git LFS
       #   run: |
