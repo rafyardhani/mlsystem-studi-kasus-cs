@@ -55,11 +55,10 @@ jobs:
         
       - name: Upload artifacts to Google Drive
         env:
-          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}    # JSON isi credential
-          # Opsional: folder ID bisa disimpan di secrets/variable
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: |
-          echo "Mulai upload folder mlruns ke Google Drive..."
+          echo "Mengunggah folder mlruns ke GDrive..."
           python MLproject/upload_to_gdrive.py "./mlruns" "$GDRIVE_FOLDER_ID"
             
       # - name: Set up Git LFS
