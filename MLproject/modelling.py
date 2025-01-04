@@ -34,8 +34,8 @@ if __name__ == "__main__":
     test_size=0.2
     )
 
-    n_estimators = float(sys.argv[1]) if len(sys.argv) > 1 else 505
-    max_depth = float(sys.argv[2]) if len(sys.argv) > 2 else 37
+    n_estimators = int(sys.argv[1]) if len(sys.argv) > 1 else 505
+    max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 37
 
     with mlflow.start_run():
         model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
         (rmse, mae, r2) = eval_metrics(y_test, predicted_qualities)
 
-        print("Elasticnet model (alpha=%f, l1_ratio=%f):" % (n_estimators, max_depth))
+        print("RF model (alpha=%f, l1_ratio=%f):" % (n_estimators, max_depth))
         print("  RMSE: %s" % rmse)
         print("  MAE: %s" % mae)
         print("  R2: %s" % r2)
