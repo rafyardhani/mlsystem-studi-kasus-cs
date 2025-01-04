@@ -8,30 +8,31 @@ from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
 def main(local_folder: str, drive_folder_id: str):
-    # 1. Baca isi JSON service account dari environment variable (GDRIVE_CREDENTIALS)
+    # 1. Baca JSON service account dari environment variable
     creds_json = os.environ.get("GDRIVE_CREDENTIALS")
     if not creds_json:
-        print("Error: GDRIVE_CREDENTIALS environment variable is empty or not set.")
+        print("Error: GDRIVE_CREDENTIALS is empty or not set.")
         sys.exit(1)
 
-    # Ubah string JSON menjadi dictionary
+    # 2. Muat jadi dictionary
     creds_dict = json.loads(creds_json)
 
-    # 2. Inisialisasi credentials dari dictionary (bukan dari file)
+    # 3. Inisialisasi Credentials
     SCOPES = ["https://www.googleapis.com/auth/drive"]
-    creds = service_account.Credentials.from_service_account_info(
-        creds_dict, scopes=SCOPES
-    )
+    creds = service_account.Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 
-    # 3. Bungkus credentials dengan AuthorizedHttp
+    # 4. Bungkus dengan AuthorizedHttp
     auth_http = AuthorizedHttp(creds)
 
-    # 4. Inject ke PyDrive2
-    gauth = GoogleAuth()
+    # 5. Nonaktifkan pemakaian file config default oleh PyDrive2
+    gauth = GoogleAuth(settings_file=None)  # Hindari pencarian file config default
+    # Optional: Matikan backend config agar tidak cari client_secrets.json
+    gauth.settings["client_config_backend"] = "disable"
     gauth.http = auth_http
+
     drive = GoogleDrive(gauth)
 
-    # 5. Upload isi folder local_folder ke Google Drive
+    # 6. Upload folder
     folder_path = pathlib.Path(local_folder)
     if not folder_path.exists():
         print(f"Error: Folder '{local_folder}' tidak ditemukan.")
@@ -48,11 +49,10 @@ def main(local_folder: str, drive_folder_id: str):
             })
             gfile.SetContentFile(str(file_path))
             gfile.Upload()
-            print(f"Uploaded: {rel_path} -> Drive folder {drive_folder_id}")
+            print(f"Uploaded: {rel_path} -> folder {drive_folder_id}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python upload.py <local_folder> <drive_folder_id>")
         sys.exit(1)
-
     main(sys.argv[1], sys.argv[2])
