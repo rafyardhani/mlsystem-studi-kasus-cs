@@ -16,12 +16,16 @@ credentials = Credentials.from_service_account_info(
 # Membangun layanan Google Drive API
 service = build('drive', 'v3', credentials=credentials)
 
-# Membuat folder di Google Drive
 folder_metadata = {
     'name': 'mlruns',
-    'mimeType': 'application/vnd.google-apps.folder'
+    'mimeType': 'application/vnd.google-apps.folder',
+    'parents': '1f5ecMJvCs6jYT2kkeNn0zoZ9xyXAWFRC'  # ID dari Shared Drive
 }
-folder = service.files().create(body=folder_metadata, fields='id').execute()
+folder = service.files().create(
+    body=folder_metadata,
+    fields='id',
+    supportsAllDrives=True
+).execute()
 
 # Upload file ke folder yang baru dibuat
 folder_id = folder.get('id')
