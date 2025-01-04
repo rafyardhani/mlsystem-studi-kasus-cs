@@ -7,10 +7,13 @@ import pathlib
 import sys
 
 def main(local_folder: str, drive_folder_id: str):
+    # 1. Tulis service account file
+    with open("service_account.json", "w") as f:
+        f.write(os.environ["GDRIVE_CREDENTIALS"])
 
     SCOPES = ["https://www.googleapis.com/auth/drive"]
     creds = service_account.Credentials.from_service_account_file(
-        os.environ["GDRIVE_CREDENTIALS"], scopes=SCOPES
+        "MLproject/service_account.json", scopes=SCOPES
     )
 
     # 2. Bungkus jadi AuthorizedHttp
