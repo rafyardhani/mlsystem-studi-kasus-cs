@@ -53,10 +53,13 @@ jobs:
           pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
         
       - name: Upload to Google Drive
-        env:
-          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}  # Mengambil kredensial dari GitHub Secrets
         run: |
-          python MLproject/upload_to_gdrive.py
+          # Misalkan folder GDrive ID disimpan sebagai secret `GDRIVE_FOLDER_ID`
+          echo "Mengunggah folder mlruns ke Google Drive..."
+          python upload_to_drive.py "./mlruns" "${{ secrets.GDRIVE_FOLDER_ID }}"
+        env:
+          # Environment var berisi credentials JSON
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
             
       # - name: Set up Git LFS
       #   run: |

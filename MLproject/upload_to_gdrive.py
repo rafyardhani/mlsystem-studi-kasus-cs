@@ -1,29 +1,44 @@
+# upload_to_drive.py
 import os
 import json
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+from pydrive2.auth import GoogleAuth
+from pydrive2.drive import GoogleDrive
 
-# Mengambil kredensial dari secret GitHub (gunakan format json)
-creds = json.loads(os.environ["GDRIVE_CREDENTIALS"])  # Ambil JSON dari secret GitHub
+def main(local_folder, drive_folder_id):
+    # Buat file credentials.json dari environment variable
+    creds_file = "service_account_credentials.json"
+    with open(creds_file, "w") as f:
+        f.write(os.environ["GDRIVE_CREDENTIALS"])
 
-# Membuat kredensial dari file JSON
-credentials = Credentials.from_service_account_info(creds)
+    # Inisialisasi GoogleAuth
+    gauth = GoogleAuth()
+    gauth.service_config = {
+        "client_config_backend": "service",
+        "service_config": creds_file
+    }
+    gauth.LoadServiceConfig()
+    gauth.Authorize()
 
-# Membangun layanan Google Drive API
-service = build('drive', 'v3', credentials=credentials)
+    drive = GoogleDrive(gauth)
 
-# Membuat folder di Google Drive
-folder_metadata = {'name': 'mlruns', 'mimeType': 'application/vnd.google-apps.folder'}
-folder = service.files().create(body=folder_metadata, fields='id').execute()
+    # Upload isi folder local_folder ke Drive
+    for root, dirs, files in os.walk(local_folder):
+        for filename in files:
+            file_path = os.path.join(root, filename)
 
-# Upload file ke folder yang baru dibuat
-folder_id = folder.get('id')
-for root, dirs, files in os.walk('./mlruns'):
-    for file_name in files:
-        file_path = os.path.join(root, file_name)
-        file_metadata = {'name': file_name, 'parents': [folder_id]}
-        media = MediaFileUpload(file_path, resumable=True)
-        service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+            # Path relatif untuk penamaan di GDrive (jika perlu)
+            rel_path = os.path.relpath(file_path, local_folder)
+            
+            gfile = drive.CreateFile({
+                "title": rel_path,  
+                "parents": [{"id": drive_folder_id}]
+            })
+            gfile.SetContentFile(file_path)
+            gfile.Upload()
 
-print("Files uploaded successfully!")
+if __name__ == "__main__":
+    
+    import sys
+    local_folder = sys.argv[1]  # e.g. "./mlruns"
+    drive_folder_id = sys.argv[2]  # folder ID di GDrive
+    main(local_folder, drive_folder_id)
