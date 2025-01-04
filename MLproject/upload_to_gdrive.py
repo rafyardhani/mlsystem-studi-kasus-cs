@@ -22,6 +22,10 @@ def main(local_folder: str, drive_folder_id: str):
     # Autentikasi service account (bukan domain-wide delegation)
     gauth.ServiceAuth()
     drive = GoogleDrive(gauth)
+    gauth.settings["service_config"] = {
+    "client_json_file_path": "service_account.json",
+    "client_user_email": "rafy@dicoding.com"
+    }
 
     # Upload folder local_folder
     folder_path = pathlib.Path(local_folder)
