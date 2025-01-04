@@ -15,11 +15,11 @@ credentials = Credentials.from_service_account_info(
 
 # Membangun layanan Google Drive API
 service = build('drive', 'v3', credentials=credentials)
-
+SHARED_DRIVE_ID = "1f5ecMJvCs6jYT2kkeNn0zoZ9xyXAWFRC"
 folder_metadata = {
     'name': 'mlruns',
     'mimeType': 'application/vnd.google-apps.folder',
-    'parents': '1f5ecMJvCs6jYT2kkeNn0zoZ9xyXAWFRC'  # ID dari Shared Drive
+    'parents': [SHARED_DRIVE_ID]  # ID dari Shared Drive
 }
 folder = service.files().create(
     body=folder_metadata,
@@ -29,7 +29,7 @@ folder = service.files().create(
 
 # Upload file ke folder yang baru dibuat
 folder_id = folder.get('id')
-for root, dirs, files in os.walk('./mlruns'):
+for root, dirs, files in os.walk('./mlruns/0'):
     for file_name in files:
         print(f"Uploading {file_name}...")
         file_path = os.path.join(root, file_name)
