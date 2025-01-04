@@ -54,33 +54,9 @@ jobs:
         
       - name: Upload to Google Drive
         env:
-          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}  # Mengambil kredensial dari GitHub Secrets
         run: |
-          python - <<EOF
-          from googleapiclient.discovery import build
-          from googleapiclient.http import MediaFileUpload
-          import json
-      
-          # Load credentials
-          creds = json.loads("""${GDRIVE_CREDENTIALS}""")
-      
-          # Build Drive service
-          service = build('drive', 'v3', credentials=creds)
-      
-          # Upload a folder
-          folder_metadata = {'name': 'mlruns', 'mimeType': 'application/vnd.google-apps.folder'}
-          folder = service.files().create(body=folder_metadata, fields='id').execute()
-      
-          # Iterate through files and upload
-          import os
-          folder_id = folder.get('id')
-          for root, _, files in os.walk('./mlruns'):
-              for name in files:
-                  file_path = os.path.join(root, name)
-                  file_metadata = {'name': name, 'parents': [folder_id]}
-                  media = MediaFileUpload(file_path, resumable=True)
-                  service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-          EOF
+          python upload_to_gdrive.py
             
       # - name: Set up Git LFS
       #   run: |
