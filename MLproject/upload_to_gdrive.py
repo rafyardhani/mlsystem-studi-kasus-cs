@@ -26,8 +26,7 @@ def main(local_folder: str, drive_folder_id: str):
 
     # 5. Nonaktifkan pemakaian file config default oleh PyDrive2
     gauth = GoogleAuth(settings_file=None)  # Hindari pencarian file config default
-    # Optional: Matikan backend config agar tidak cari client_secrets.json
-    gauth.settings["client_config_backend"] = "disable"
+    
     gauth.http = auth_http
 
     drive = GoogleDrive(gauth)
