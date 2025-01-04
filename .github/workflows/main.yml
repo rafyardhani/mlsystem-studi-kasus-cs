@@ -56,7 +56,7 @@ jobs:
         run: |
           # Misalkan folder GDrive ID disimpan sebagai secret `GDRIVE_FOLDER_ID`
           echo "Mengunggah folder mlruns ke Google Drive..."
-          python MLproject/upload_to_drive.py "./mlruns" "${{ secrets.GDRIVE_FOLDER_ID }}"
+          python MLproject/upload_to_gdrive.py "./mlruns" "${{ secrets.GDRIVE_FOLDER_ID }}"
         env:
           # Environment var berisi credentials JSON
           GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
