@@ -62,7 +62,7 @@ jobs:
           import json
       
           # Load credentials
-          creds = json.loads("${{ secrets.GDRIVE_CREDENTIALS }}")
+          creds = json.loads("""${GDRIVE_CREDENTIALS}""")
       
           # Build Drive service
           service = build('drive', 'v3', credentials=creds)
