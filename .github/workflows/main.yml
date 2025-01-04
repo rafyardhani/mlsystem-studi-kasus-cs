@@ -50,18 +50,14 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install mlflow PyDrive2
-          pip install mlflow PyDrive2 google-auth google-auth-httplib2
+          pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
         
-      - name: Upload artifacts to Google Drive
-        env:
-          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
-          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
-        run: |
-          echo "Mengunggah folder mlruns ke GDrive..."
-          python MLproject/upload_to_gdrive.py "./mlruns" "$GDRIVE_FOLDER_ID"
-            
+      - name: Upload to Google Drive
+          env:
+            GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}  # Mengambil kredensial dari GitHub Secrets
+          run: |
+            python MLproject/upload_to_gdrive.py
+          
       # - name: Set up Git LFS
       #   run: |
       #     git config --global user.name ${{ secrets.username }}
