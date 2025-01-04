@@ -40,5 +40,5 @@ if __name__ == "__main__":
     
     import sys
     local_folder = sys.argv[1]  # e.g. "./mlruns"
-    drive_folder_id = "1f5ecMJvCs6jYT2kkeNn0zoZ9xyXAWFRC"  # folder ID di GDrive
+    drive_folder_id = sys.argv[2]  # folder ID di GDrive
     main(local_folder, drive_folder_id)
