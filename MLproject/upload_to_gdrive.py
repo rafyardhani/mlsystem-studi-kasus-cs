@@ -27,14 +27,14 @@ folder = service.files().create(body=folder_metadata, fields='id').execute()
 folder_id = folder.get('id')
 for root, dirs, files in os.walk('./mlruns'):
     for file_name in files:
+        print(f"Uploading {file_name}...")
         file_path = os.path.join(root, file_name)
         file_metadata = {'name': file_name, 'parents': [folder_id]}
         media = MediaFileUpload(file_path, resumable=True)
         service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
-print("Files uploaded successfully!")
+print("Files uploaded successfully! to link: https://drive.google.com/drive/folders/" + folder_id)
 
-folder_id = "ID_FOLDER_YANG_INGIN_DISHARE"
 permission = {
     'type': 'user',                         # user, group, domain, atau anyone
     'role': 'writer',                       # owner, organizer, writer, atau reader
