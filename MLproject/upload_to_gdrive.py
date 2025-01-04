@@ -35,16 +35,3 @@ for root, dirs, files in os.walk('./mlruns'):
 
 print("Files uploaded successfully! to link: https://drive.google.com/drive/folders/" + folder_id)
 
-permission = {
-    'type': 'user',                         # user, group, domain, atau anyone
-    'role': 'writer',                       # owner, organizer, writer, atau reader
-    'emailAddress': 'rafy@dicoding.com'
-}
-
-service.permissions().create(
-    fileId=folder_id,
-    body=permission,
-    fields='id'
-).execute()
-
-print("berhasil membagikan folder ke")
