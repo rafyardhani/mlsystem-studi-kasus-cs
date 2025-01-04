@@ -48,9 +48,9 @@ jobs:
           mlflow run MLproject --env-manager=local 
       
 
-          - name: Install Python dependencies
-          run: |
-            pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
         
       - name: Upload to Google Drive
         env:
