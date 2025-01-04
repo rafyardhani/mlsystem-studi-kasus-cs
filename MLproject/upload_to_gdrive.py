@@ -15,7 +15,7 @@ credentials = Credentials.from_service_account_info(
 service = build('drive', 'v3', credentials=credentials)
 
 # 3. Gunakan ID Shared Drive (atau folder di Shared Drive) sebagai "parent"
-SHARED_DRIVE_ID = "1f5ecMJvCs6jYT2kkeNn0zoZ9xyXAWFRC"
+SHARED_DRIVE_ID = os.environ["GDRIVE_FOLDER_ID"]
 # Pastikan service account sudah diundang ke Shared Drive sebagai Content Manager / Manager
 
 def upload_directory(local_dir_path, parent_drive_id):
