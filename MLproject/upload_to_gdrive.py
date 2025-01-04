@@ -38,7 +38,7 @@ folder_id = "ID_FOLDER_YANG_INGIN_DISHARE"
 permission = {
     'type': 'user',                         # user, group, domain, atau anyone
     'role': 'writer',                       # owner, organizer, writer, atau reader
-    'emailAddress': 'email.pribadi@gmail.com'
+    'emailAddress': 'rafy@dicoding.com'
 }
 
 service.permissions().create(
