@@ -1,43 +1,36 @@
-import os
-import sys
-import pathlib
-import logging
-
+from google.oauth2 import service_account
+from google_auth_httplib2 import AuthorizedHttp
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
+import os
+import pathlib
+import sys
 
 def main(local_folder: str, drive_folder_id: str):
-    # 1. Tulis file service_account.json dari ENV: GDRIVE_CREDENTIALS
-    service_account_file = "service_account.json"
-    with open(service_account_file, "w") as f:
-        f.write(os.environ["GDRIVE_CREDENTIALS"])  # Pastikan secret sudah disiapkan
+    # 1. Tulis service account file
+    with open("service_account.json", "w") as f:
+        f.write(os.environ["GDRIVE_CREDENTIALS"])
 
-    # 2. Konfigurasi PyDrive2 (service account)
+    SCOPES = ["https://www.googleapis.com/auth/drive"]
+    creds = service_account.Credentials.from_service_account_file(
+        "service_account.json", scopes=SCOPES
+    )
+
+    # 2. Bungkus jadi AuthorizedHttp
+    auth_http = AuthorizedHttp(creds)
+
+    # 3. Inject ke PyDrive2
     gauth = GoogleAuth()
-    gauth.settings["client_config_backend"] = "service"
-    # Pastikan "client_user_email" tidak diisi jika TIDAK perlu domain-wide delegation
-    gauth.settings["service_config"] = {
-        "client_json_file_path": service_account_file
-    }
-
-    # 3. Autentikasi
-    gauth.ServiceAuth()
+    gauth.http = auth_http
     drive = GoogleDrive(gauth)
 
-    # 4. Pastikan folder lokal ada
+    # 4. Upload isi folder
     folder_path = pathlib.Path(local_folder)
-    if not folder_path.exists():
-        logging.error(f"Folder '{local_folder}' tidak ditemukan!")
-        sys.exit(1)
-
-    # 5. Rekursif upload isi folder local_folder
     for root, dirs, files in os.walk(folder_path):
         for filename in files:
             file_path = pathlib.Path(root) / filename
-            # Buat path relatif untuk penamaan file di Drive
             rel_path = file_path.relative_to(folder_path)
 
-            # Buat file di GDrive
             gfile = drive.CreateFile({
                 "title": str(rel_path),
                 "parents": [{"id": drive_folder_id}]
@@ -45,12 +38,8 @@ def main(local_folder: str, drive_folder_id: str):
             gfile.SetContentFile(str(file_path))
             gfile.Upload()
 
-            logging.info(f"Uploaded: {rel_path} -> Drive folder {drive_folder_id}")
-
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python upload_to_drive.py <local_folder> <drive_folder_id>")
+        print("Usage: python upload.py <local_folder> <drive_folder_id>")
         sys.exit(1)
-    local_folder_arg = sys.argv[1]
-    drive_folder_id_arg = sys.argv[2]
-    main(local_folder_arg, drive_folder_id_arg)
+    main(sys.argv[1], sys.argv[2])
