@@ -56,7 +56,7 @@ jobs:
         env:
           GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}  # Mengambil kredensial dari GitHub Secrets
         run: |
-          python upload_to_gdrive.py
+          python MLproject/upload_to_gdrive.py
             
       # - name: Set up Git LFS
       #   run: |
