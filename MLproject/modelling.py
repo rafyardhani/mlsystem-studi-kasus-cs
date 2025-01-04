@@ -33,7 +33,7 @@ if __name__ == "__main__":
     random_state=42,
     test_size=0.2
     )
-
+    input_example = X_train[0:5]
     n_estimators = int(sys.argv[1]) if len(sys.argv) > 1 else 505
     max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 37
 
@@ -43,17 +43,13 @@ if __name__ == "__main__":
 
         predicted_qualities = model.predict(X_test)
 
-        (rmse, mae, r2) = eval_metrics(y_test, predicted_qualities)
-
-        print("RF model (alpha=%f, l1_ratio=%f):" % (n_estimators, max_depth))
-        print("  RMSE: %s" % rmse)
-        print("  MAE: %s" % mae)
-        print("  R2: %s" % r2)
-
-        mlflow.log_param("alpha", n_estimators)
-        mlflow.log_param("l1_ratio", max_depth)
-        mlflow.log_metric("rmse", rmse)
-        mlflow.log_metric("r2", r2)
-        mlflow.log_metric("mae", mae)
+        mlflow.sklearn.log_model(
+        sk_model=model,
+        artifact_path="model",
+        input_example=input_example
+        )
+        model.fit(X_train, y_train)
+        # Log metrics
+        accuracy = model.score(X_test, y_test)
 
         mlflow.sklearn.log_model(model, "model")
