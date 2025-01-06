@@ -13,9 +13,6 @@ on:
 env:
   CSV_URL: "MLproject/train_pca.csv"
   TARGET_VAR: "Credit_Score"
-  n_estimators: 505
-  max_depth: 38
-  RANDOM_STATE: 42
 
 jobs:
   build:
