@@ -27,7 +27,7 @@ if __name__ == "__main__":
     input_example = X_train[0:5]
     n_estimators = int(sys.argv[1]) if len(sys.argv) > 1 else 505
     max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 37
-    dagshub.init(repo_owner='rafyardhani', repo_name='my-first-repo', mlflow=True)
+    # dagshub.init(repo_owner='rafyardhani', repo_name='my-first-repo', mlflow=True)
     mlflow.set_tracking_uri("https://dagshub.com/rafyardhani/my-first-repo.mlflow")
     with mlflow.start_run():
         model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
