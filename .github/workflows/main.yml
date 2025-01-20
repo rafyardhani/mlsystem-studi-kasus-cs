@@ -43,7 +43,7 @@ jobs:
       - name: Run mlflow project
         run: |
           set -x
-          dagshub login --username rafyardhanie --token ${{ secrets.DAGSHUB }}
+          dagshub login --token ${{ secrets.DAGSHUB }}
           mlflow run MLproject --env-manager=local 
       
 
