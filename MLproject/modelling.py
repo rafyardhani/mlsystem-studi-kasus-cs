@@ -27,10 +27,18 @@ if __name__ == "__main__":
     input_example = X_train[0:5]
     n_estimators = int(sys.argv[1]) if len(sys.argv) > 1 else 505
     max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 37
-    dagshub.init(repo_owner='rafyardhani', repo_name='mlsystem-studi-kasus-cs', mlflow=True)
+    dagshub.init(repo_owner='rafyardhani',
+             repo_name='mlsystem-studi-kasus-cs',
+             mlflow=True)
+    def get_or_create_experiment_id(name):
+        exp = mlflow.get_experiment_by_name(name)
+        if exp is None:
+            exp_id = mlflow.create_experiment(name)
+            return exp_id
+        return exp.experiment_id
     # mlflow.set_tracking_uri("https://dagshub.com/rafyardhani/latihan-cc.mlflow")
     # mlflow.set_experiment("Latihan Credit Scoring")
-    with mlflow.start_run():
+    with mlflow.start_run(experiment_id=exp.experiment_id):
         model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
         model.fit(X_train, y_train)
 
