@@ -7,6 +7,7 @@ import numpy as np
 import os
 import warnings
 import sys
+import dagshub
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     input_example = X_train[0:5]
     n_estimators = int(sys.argv[1]) if len(sys.argv) > 1 else 505
     max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 37
+    dagshub.init(repo_owner='rafyardhani', repo_name='my-first-repo', mlflow=True)
 
     with mlflow.start_run():
         model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
