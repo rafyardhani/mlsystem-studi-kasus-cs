@@ -39,11 +39,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install mlflow dagshub 
       
+      - name: Set MLflow Tracking URI
+        run: echo "MLFLOW_TRACKING_URI=https://rafyardhanie:${{ secrets.DAGSHUB }}@dagshub.com/rafyardhanie/mlsystem-studi-kasus-cs.mlflow" >> $GITHUB_ENV
+          
       # Run as a mlflow project
       - name: Run mlflow project
         run: |
           mlflow run MLproject --env-manager=local 
-      
 
       - name: Install Python dependencies
         run: |
