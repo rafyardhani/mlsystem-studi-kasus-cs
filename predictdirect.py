@@ -1,4 +1,6 @@
 from mlflow.models import validate_serving_input
+import mlflow
+import pandas as pd
 
 # Format data input
 input_data = {
@@ -93,3 +95,8 @@ model_uri = 'runs:/3019d2c53fe0484aa49ceae3bffea433/model'
 # serving_payload = convert_input_example_to_serving_input(X_test)
 # Validate the serving payload works on the model
 print(validate_serving_input(model_uri, input_data))
+
+model = mlflow.pyfunc.load_model(model_uri)
+df = pd.DataFrame(input_data["dataframe_split"]["data"], columns=input_data["dataframe_split"]["columns"])
+pred = model.predict(df)
+print(pred)

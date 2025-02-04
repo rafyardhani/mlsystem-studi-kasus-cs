@@ -100,7 +100,7 @@ def prediction(data):
     final_result = result_target.inverse_transform(result)[0]
     return final_result
 
-model_uri = 'runs:/3019d2c53fe0484aa49ceae3bffea433/model'
+model_uri = 'runs:/de58517c59e74560ae3bdca7f017163b/model'
 model = mlflow.pyfunc.load_model(model_uri)
 result_target = joblib.load("model/encoder_target.joblib")
 
