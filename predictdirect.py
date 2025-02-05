@@ -1,10 +1,11 @@
-from mlflow.models import validate_serving_input
+from mlflow.models import validate_serving_input, convert_input_example_to_serving_input
 import mlflow
 import pandas as pd
+import json
+
 
 # Format data input
-input_data = {
-  "dataframe_split": {
+data = {
     "columns": [
       "Age",
       "Credit_Mix",
@@ -86,15 +87,15 @@ input_data = {
       ]
     ]
   }
-}
 
 model_uri = 'runs:/3019d2c53fe0484aa49ceae3bffea433/model'
 
 # Define INPUT_EXAMPLE via assignment with your own input example to the model
 # A valid input example is a data instance suitable for pyfunc prediction
-# serving_payload = convert_input_example_to_serving_input(X_test)
+input_data = json.loads(convert_input_example_to_serving_input(data))
+input_data = {"dataframe_split": input_data["inputs"]}
 # Validate the serving payload works on the model
-print(validate_serving_input(model_uri, input_data))
+# print(validate_serving_input(model_uri, input_data))
 
 model = mlflow.pyfunc.load_model(model_uri)
 df = pd.DataFrame(input_data["dataframe_split"]["data"], columns=input_data["dataframe_split"]["columns"])
